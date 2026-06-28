@@ -1,0 +1,19 @@
+# Custom shared MCP tool server — usable by both Declarative and BYO agents.
+#
+# After deployment, kagent controller creates:
+#   - Deployment: shared-utils (namespace: kagent)
+#   - Service: shared-utils.kagent.svc.cluster.local:3000
+#
+# Any pod in the cluster can connect to this Service directly.
+apiVersion: kagent.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: shared-utils
+  namespace: kagent
+spec:
+  deployment:
+    image: ghcr.io/YOUR_ORG/shared-utils-mcp:latest
+    port: 3000
+    # agentgateway executes cmd as a single executable path (no shell expansion)
+    cmd: "/app/run.sh"
+  transportType: stdio

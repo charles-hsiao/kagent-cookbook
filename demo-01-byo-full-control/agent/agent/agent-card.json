@@ -1,0 +1,19 @@
+{
+  "name": "custom-adk-agent",
+  "description": "Custom ADK agent with BuiltInPlanner enabled. Demonstrates full ADK customization via BYO deployment.",
+  "url": "http://localhost:8080",
+  "version": "0.1.0",
+  "capabilities": {
+    "streaming": true
+  },
+  "defaultInputModes": ["text"],
+  "defaultOutputModes": ["text"],
+  "skills": [
+    {
+      "id": "general-reasoning",
+      "name": "General Reasoning",
+      "description": "Answers questions and completes tasks using BuiltInPlanner with extended thinking.",
+      "tags": ["reasoning", "planning"]
+    }
+  ]
+}

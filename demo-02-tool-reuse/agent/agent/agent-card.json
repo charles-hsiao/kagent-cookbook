@@ -1,0 +1,19 @@
+{
+  "name": "byo-agent-with-shared-tools",
+  "description": "BYO agent that directly connects to shared MCP tool server in the kagent namespace.",
+  "url": "http://localhost:8080",
+  "version": "0.1.0",
+  "capabilities": {
+    "streaming": true
+  },
+  "defaultInputModes": ["text"],
+  "defaultOutputModes": ["text"],
+  "skills": [
+    {
+      "id": "shared-mcp-tools",
+      "name": "Shared MCP Tools",
+      "description": "Uses the shared-utils MCP server for fetch and utility operations.",
+      "tags": ["tools", "mcp", "fetch"]
+    }
+  ]
+}

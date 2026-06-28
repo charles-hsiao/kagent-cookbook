@@ -1,0 +1,22 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: custom-adk-agent
+  namespace: kagent
+spec:
+  description: >
+    Custom ADK agent with BuiltInPlanner enabled.
+    Demonstrates full ADK customization via BYO deployment.
+  type: BYO
+  byo:
+    deployment:
+      # Replace with your actual image after: docker build & push
+      image: ghcr.io/YOUR_ORG/custom-adk-agent:latest
+      env:
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: kagent-google
+              key: GOOGLE_API_KEY
+        - name: AGENT_MODEL
+          value: "gemini-2.5-flash"

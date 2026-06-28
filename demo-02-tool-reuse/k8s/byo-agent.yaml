@@ -1,0 +1,21 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: byo-agent-with-shared-tools
+  namespace: kagent
+spec:
+  description: BYO agent that directly connects to shared MCP tool server
+  type: BYO
+  byo:
+    deployment:
+      image: ghcr.io/YOUR_ORG/byo-mcp-agent:latest
+      env:
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: kagent-google
+              key: GOOGLE_API_KEY
+        # BYO agent reads the MCP server URL from env
+        # The MCPServer CRD creates a K8s Service with this DNS name
+        - name: MCP_SERVER_URL
+          value: "http://shared-utils.kagent.svc.cluster.local:3000"
