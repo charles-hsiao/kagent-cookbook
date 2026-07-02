@@ -1,0 +1,14 @@
+# ModelConfig for Ollama + Llama 3.2.
+#
+# Ollama does NOT require an API key — apiKeySecret is intentionally omitted.
+# The host points to the Ollama Service created by ollama.yaml.
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: ollama-llama32
+  namespace: kagent
+spec:
+  model: llama3.2
+  provider: Ollama
+  ollama:
+    host: http://ollama.ollama.svc.cluster.local
