@@ -1,0 +1,48 @@
+# Declarative HITL agent — pauses for approval before any destructive K8s operation.
+#
+# How it works:
+#   - toolNames     : all tools the agent may call
+#   - requireApproval: subset that pause execution until the user clicks Approve / Reject
+#
+# Read-only tools (get_resources, describe, logs, events, yaml) run freely.
+# Write tools (apply_manifest, delete_resource, patch_resource) pause for approval.
+# ask_user is built into every kagent agent — no extra config needed.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: hitl-agent
+  namespace: kagent
+spec:
+  description: >
+    Kubernetes management agent with human-in-the-loop approval gates.
+    Read operations run freely; destructive operations (apply/delete/patch)
+    pause for human approval. Uses ask_user to clarify ambiguous requests.
+  type: Declarative
+  declarative:
+    modelConfig: default-model-config
+    systemMessage: |
+      You are a Kubernetes management agent. You help users inspect and manage
+      resources in the cluster. Before making any changes, explain what you
+      plan to do. If the user's request is ambiguous, use the ask_user tool
+      to clarify before proceeding.
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: kagent-tool-server
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            # Read-only — run immediately, no approval needed
+            - k8s_get_resources
+            - k8s_describe_resource
+            - k8s_get_pod_logs
+            - k8s_get_events
+            - k8s_get_resource_yaml
+            # Write — pause for human approval
+            - k8s_apply_manifest
+            - k8s_delete_resource
+            - k8s_patch_resource
+          requireApproval:
+            - k8s_apply_manifest
+            - k8s_delete_resource
+            - k8s_patch_resource
