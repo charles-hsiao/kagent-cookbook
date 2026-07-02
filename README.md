@@ -34,6 +34,7 @@ kagent supports two complementary agent models:
 | 01 | [demo-01-byo-full-control](./demo-01-byo-full-control/) | Full ADK control — `BuiltInPlanner`, `ThinkingConfig`, custom callbacks |
 | 02 | [demo-02-tool-reuse](./demo-02-tool-reuse/) | BYO agent connecting directly to a shared `MCPServer` via cluster DNS |
 | 03 | [demo-03-local-llm](./demo-03-local-llm/) | Declarative agent running on a local LLM (Ollama) — no cloud API key |
+| 04 | [demo-04-hitl](./demo-04-hitl/) | Declarative agent with `requireApproval` — read ops run freely, write ops pause for human sign-off |
 
 Each demo folder contains a `README.md` with a detailed walkthrough.
 
@@ -57,6 +58,7 @@ export GOOGLE_API_KEY=<your-google-api-key>
 ./demo-01-byo-full-control/deploy-kind.sh
 ./demo-02-tool-reuse/deploy-kind.sh
 ./demo-03-local-llm/deploy-kind.sh
+./demo-04-hitl/deploy-kind.sh
 ```
 
 The kagent UI is available at **http://localhost:8080** after setup.
