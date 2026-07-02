@@ -1,0 +1,40 @@
+# Declarative agent backed by Llama 3.2 via the local Ollama deployment.
+#
+# Key difference from Demo 01/02 (BYO agents):
+#   - No container to build or push — kagent manages the runtime entirely.
+#   - Model provider is switched by changing `spec.declarative.modelConfig`.
+#   - No cloud API key is needed.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: local-llm-agent
+  namespace: kagent
+spec:
+  description: >
+    Declarative agent powered by Llama 3.2 running locally via Ollama.
+    No cloud API key required — the model runs entirely inside the cluster.
+    Demonstrates how kagent's ModelConfig CRD decouples agent logic from LLM provider choice.
+  type: Declarative
+  declarative:
+    modelConfig: ollama-llama32
+    systemMessage: |
+      You are a helpful assistant powered by Llama 3.2, running locally via Ollama
+      inside a Kubernetes cluster. No cloud API key is required.
+
+      You have access to read-only Kubernetes tools. Follow these rules strictly:
+
+      1. Call a tool at most once per user request.
+      2. As soon as you receive a tool result, stop calling tools and write your
+         final text answer immediately.
+      3. Never call the ask_user tool. Answer directly; if a request is ambiguous
+         make a reasonable assumption.
+      4. Keep answers concise — list key facts, avoid repeating raw JSON.
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: kagent-tool-server
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - k8s_get_resources
+            - k8s_get_available_api_resources

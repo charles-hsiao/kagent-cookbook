@@ -1,0 +1,52 @@
+# Deploy Ollama as a Kubernetes Deployment + Service.
+# Following the pattern from the official kagent Ollama docs:
+# https://www.kagent.dev/docs/kagent/supported-providers/ollama
+#
+# After deployment, the Ollama API is reachable inside the cluster at:
+#   http://ollama.ollama.svc.cluster.local (port 80 → container 11434)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ollama
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  selector:
+    matchLabels:
+      name: ollama
+  template:
+    metadata:
+      labels:
+        name: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        ports:
+        - name: http
+          containerPort: 11434
+          protocol: TCP
+        resources:
+          requests:
+            memory: "2Gi"
+          limits:
+            memory: "6Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  type: ClusterIP
+  selector:
+    name: ollama
+  ports:
+  - port: 80
+    name: http
+    targetPort: http
+    protocol: TCP

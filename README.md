@@ -1,12 +1,16 @@
-# kagent BYO Agent Demo
+# kagent Cookbook
 
-End-to-end examples showing what you can build with kagent's BYO Agent mode — full ADK control and shared MCP tool reuse.
+A collection of end-to-end examples showcasing what you can build with [kagent](https://kagent.dev) — each demo targets a distinct use case and is self-contained with its own manifests and deployment script.
 
 ---
 
-## Declarative vs BYO Agent
+## What is kagent?
 
-kagent offers two agent types:
+[kagent](https://kagent.dev) is a Kubernetes-native agent runtime. It manages AI agents as first-class Kubernetes resources (CRDs), handles routing via the [A2A protocol](https://google.github.io/A2A/), and integrates with MCP tool servers and multiple LLM providers.
+
+### Agent Types
+
+kagent supports two complementary agent models:
 
 | Feature | Declarative Agent | BYO Agent |
 |---------|-------------------|-----------|
@@ -14,76 +18,28 @@ kagent offers two agent types:
 | ADK config | kagent-supported params only | 100% free |
 | Tool connection | Declared via `spec.tools` | Wired in code |
 | Getting started | Easy (YAML only) | Moderate (container required) |
-| Use case | Standard tool combinations | Custom ADK behavior |
+| Best for | Standard tool combinations | Custom ADK behaviour |
 
 **How BYO Agent works:**
-1. You package a container that implements the A2A protocol and listens on port 8080
-2. Use the `kagent-adk` CLI (`pip install kagent-adk`) to automatically wrap an ADK agent as an A2A server — no HTTP code needed
-3. kagent deploys the container as a K8s Deployment and proxies `/api/a2a/{namespace}/{agent-name}/...`
+1. Package a container that implements the A2A protocol on port 8080
+2. Use `kagent-adk` (`pip install kagent-adk`) to wrap an ADK agent as an A2A server — no HTTP boilerplate needed
+3. kagent deploys it as a Kubernetes Deployment and proxies `/api/a2a/{namespace}/{agent-name}/…`
 
 ---
 
-## Use Cases
+## Demos
 
-### Use Case 1: Full ADK Control
+| # | Demo | What it shows |
+|---|------|---------------|
+| 01 | [demo-01-byo-full-control](./demo-01-byo-full-control/) | Full ADK control — `BuiltInPlanner`, `ThinkingConfig`, custom callbacks |
+| 02 | [demo-02-tool-reuse](./demo-02-tool-reuse/) | BYO agent connecting directly to a shared `MCPServer` via cluster DNS |
+| 03 | [demo-03-local-llm](./demo-03-local-llm/) | Declarative agent running on a local LLM (Ollama) — no cloud API key |
 
-BYO agents let you write ADK code directly, unlocking features unavailable in Declarative agents:
-
-- `BuiltInPlanner` and `ThinkingConfig`
-- Any feature from any ADK version
-- Custom before/after callbacks
-- Composing multiple sub-agents
-
-See [demo-01-byo-full-control](./demo-01-byo-full-control/)
-
----
-
-### Use Case 2: Reusing Shared MCP Tools
-
-The kagent `MCPServer` CRD creates a real Kubernetes Service. Any pod in the cluster can connect to it directly via DNS — including BYO agents:
-
-```
-http://<mcp-server-name>.<namespace>.svc.cluster.local:<port>
-```
-
-A BYO agent connects to this URL using `MCPToolset`, accessing the same tools as Declarative agents without routing through kagent's tool system.
-
-See [demo-02-tool-reuse](./demo-02-tool-reuse/)
-
----
-
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────┐
-│                  Kubernetes Cluster                  │
-│                                                      │
-│  ┌──────────────┐    ┌──────────────────────────┐   │
-│  │ kagent       │    │ MCPServer CRD            │   │
-│  │ Controller   │───▶│ → K8s Deployment + Svc   │   │
-│  └──────────────┘    │   (e.g. fetch, k8s-tools)│   │
-│         │            └──────────┬───────────────┘   │
-│         │                       │ cluster DNS        │
-│         ▼                       ▼                    │
-│  ┌──────────────┐    ┌──────────────────────────┐   │
-│  │ Declarative  │    │ BYO Agent Pod            │   │
-│  │ Agent Pod    │    │ (your container)         │   │
-│  │ (kagent mgd) │    │ - full ADK control       │   │
-│  └──────────────┘    │ - direct MCP connection  │   │
-│                      └──────────────────────────┘   │
-│                                                      │
-│  kagent API proxy: /api/a2a/{ns}/{agent-name}/...   │
-└─────────────────────────────────────────────────────┘
-```
+Each demo folder contains a `README.md` with a detailed walkthrough.
 
 ---
 
 ## Quick Start
-
-Each demo folder has its own README. Recommended reading order:
-
-1. **[demo-01-byo-full-control](./demo-01-byo-full-control/)** — Full ADK control with a BYO agent
-2. **[demo-02-tool-reuse](./demo-02-tool-reuse/)** — BYO agent reusing kagent MCP tools
 
 ### Prerequisites
 
@@ -97,11 +53,10 @@ Each demo folder has its own README. Recommended reading order:
 export GOOGLE_API_KEY=<your-google-api-key>
 ./scripts/kind-setup.sh
 
-# 2a. Deploy demo-01 (BYO agent with BuiltInPlanner)
+# 2. Deploy any demo independently
 ./demo-01-byo-full-control/deploy-kind.sh
-
-# 2b. Deploy demo-02 (BYO agent reusing shared MCP tools)
 ./demo-02-tool-reuse/deploy-kind.sh
+./demo-03-local-llm/deploy-kind.sh
 ```
 
 The kagent UI is available at **http://localhost:8080** after setup.
